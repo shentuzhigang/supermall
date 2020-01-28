@@ -1,19 +1,23 @@
 <template>
   <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-
+    <tab-control class="tab-control"
+                 :titles="['流行', '新款', '精选']"
+                 @tabClick="tabClick"
+                 ref="tabControlFix"
+                 v-show="isFixedTop" />
     <scroll class="content"
             ref="scroll"
             :probe-type="3"
             @scroll="contentScroll"
             :pull-up-load="true"
             @pullingUp="loadMore">
-      <home-swiper :banners="banners"/>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control class="tab-control"
-                   :titles="['流行', '新款', '精选']"
-                   @tabClick="tabClick"/>
+      <tab-control :titles="['流行', '新款', '精选']"
+                   @tabClick="tabClick"
+                   ref="tabControl" />
       <good-list :goods="showGoods"/>
     </scroll>
     <div>呵呵呵呵</div>
@@ -32,6 +36,10 @@
   import Scroll from 'components/common/scroll/Scroll'
   import BackTop from 'components/content/backTop/BackTop'
   import { getHomeMultidata, getHomeGoods } from "network/home"
+
+
+  import {debounce} from 'common/utils'
+
 
   export default {
     name: "Home",
@@ -55,7 +63,10 @@
           'sell': {page: 0, list: []},
         },
         currentType: 'pop',
-        isShowBackTop: false
+        isShowBackTop: false,
+        isFixedTop:false,
+        offsetTop:0,
+        Y:0
       }
     },
     computed: {
@@ -72,10 +83,31 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
+    mounted(){
+        // 图片加载
+        const refresh = debounce(this.$refs.scroll.refresh,500)
+        this.$bus.$on('itemImageLoad', ()=>{
+            //console.log("Load")
+            refresh()
+        })
+    },
+    destroyed(){
+
+    },
+    activated(){
+      this.$refs.scroll.scrollTo(0,this.Y,0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated(){
+      this.Y=this.$refs.scroll.getScrollY()
+    },
     methods: {
       /**
        * 事件监听相关的方法
        */
+      swiperImageLoad(){
+          this.offsetTop=this.$refs.tabControl.$el.offsetTop
+      },
       tabClick(index) {
         switch (index) {
           case 0:
@@ -88,12 +120,15 @@
             this.currentType = 'sell'
             break
         }
+        this.$refs.tabControlFix.currentIndex = index
+        this.$refs.tabControl.currentIndex = index
       },
       backClick() {
         this.$refs.scroll.scrollTo(0, 0)
       },
       contentScroll(position) {
         this.isShowBackTop = (-position.y) > 1000
+        this.isFixedTop = (-position.y) > this.offsetTop
       },
       loadMore() {
         this.getHomeGoods(this.currentType)

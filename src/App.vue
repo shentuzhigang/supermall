@@ -2,7 +2,9 @@
   <div id="app" class="wrapper">
 <!--    <img alt="Vue logo" src="./assets/logo.png">-->
 <!--    <HelloWorld msg="Welcome to Your Vue.js App"/>-->
-    <router-view/>
+    <keep-alive>
+      <router-view/>
+    </keep-alive>
 
     <MainTabBar/>
   </div>
