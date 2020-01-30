@@ -1,4 +1,4 @@
-# vuecli3demo
+# SuperMall
 
 ## Project setup
 ```
