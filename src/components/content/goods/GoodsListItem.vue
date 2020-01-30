@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item" @click="itemClick">
-    <img :src="goodsItem.show.img" alt="" @load="imgaLoad"/>
+    <img :src="showImage" alt="" @load="imgaLoad"/>
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -20,13 +20,23 @@
                 }
             }
         },
+        computed:{
+            showImage(){
+                return this.goodsItem.image || this.goodsItem.show.img
+            }
+        },
         methods:{
             imgaLoad(){
                 this.$bus.$emit('itemImageLoad')
             },
             itemClick() {
-                console.log("Click")
-                this.$router.push('/detail/' + this.goodsItem.iid)
+               // console.log("Click")
+                if(this.goodsItem.iid){
+                    this.$router.push('/detail/' + this.goodsItem.iid )
+                }else{
+                    this.$router.push('/detail/' + this.goodsItem['item_id'] )
+                }
+
             }
         }
     }
@@ -78,7 +88,7 @@
     top: -1px;
     width: 14px;
     height: 14px;
-    background: url("~assets/img/common/collect.svg") 0 0/14px 14px;
+    background: url('~assets/img/common/collect.svg') 0 0/14px 14px;
   }
 
 </style>

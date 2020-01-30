@@ -21,7 +21,7 @@
       <good-list :goods="showGoods"/>
     </scroll>
     <div>呵呵呵呵</div>
-    <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <back-top @click.native="backTopClick" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -95,11 +95,13 @@
 
     },
     activated(){
-      this.$refs.scroll.scrollTo(0,this.Y,0)
+      this.$refs.scroll.scrollTo(0,this.Y)
       this.$refs.scroll.refresh()
+        console.log(this.Y)
     },
     deactivated(){
       this.Y=this.$refs.scroll.getScrollY()
+        console.log(1)
     },
     methods: {
       /**
@@ -123,7 +125,7 @@
         this.$refs.tabControlFix.currentIndex = index
         this.$refs.tabControl.currentIndex = index
       },
-      backClick() {
+      backTopClick() {
         this.$refs.scroll.scrollTo(0, 0)
       },
       contentScroll(position) {
